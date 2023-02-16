@@ -1,0 +1,26 @@
+server:
+  port: 80
+
+spring:
+  profiles:
+    active: dev
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 5GB
+      max-request-size: 5GB
+
+pageNum: 1
+pageSize: 5
+
+---
+spring:
+  profiles: dev
+
+filepath: d:/test
+---
+spring:
+  profiles: test
+
+filepath: /opt/WebTool

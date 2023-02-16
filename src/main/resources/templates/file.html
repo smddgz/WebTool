@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>File</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/jquery.contextMenu.css">
+
+    <script src="/js/jquery-3.6.3.min.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/jquery.contextMenu.js"></script>
+</head>
+<style>
+    .directory {
+        cursor: pointer;
+    }
+
+    .header-icon {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+    }
+
+    .progress-bar {
+        display: none;
+        font-size: 0.75rem;
+    }
+</style>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <input type="file" style="display: none" id="file-input">
+        <div class="col-md-6 main">
+
+            <!--     <=768px 手机端       -->
+            <div class="d-block d-md-none">
+                <div class="row align-items-center" style="padding: 12px 0 12px 0">
+                    <div class="col-7">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Recipient's username"
+                                   aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <span class="input-group-text" id="basic-addon2">
+                                <img src="/img/search.png" style="width: 25px;height: 25px" alt="">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-1">
+
+                    </div>
+                    <div class="col-1">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="col-1 upload">
+                        <img id="uploadImg" src="/img/upload.png" style="width: 25px;height: 25px" alt="">
+                    </div>
+                    <div class="col-1 home">
+                        <img src="/img/home.png" style="width: 25px;height: 25px" alt="">
+                    </div>
+                </div>
+                <ul class="list-group">
+                    <li th:each="f:${files}"
+                        th:class="${f.isDirectory}?'directory list-group-item':'file list-group-item'"
+                        th:filename="${f.filename}"
+                        th:data-bs-toggle="${f.isDirectory}?'':'offcanvas'" data-bs-target="#offcanvasBottom">
+                        <div class="row align-items-center">
+                            <div class="col-1">
+                                <img th:src="${f.icon}" style="width: 25px;height: 25px">
+                            </div>
+                            <div class="col-11">
+                                <div th:text="${f.filename}"></div>
+                                <div style="font-size: 0.75rem" th:text="${f.modifyTime}"></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom"
+                     aria-labelledby="offcanvasBottomLabel" style="margin: 0 20px 20px 20px;border-radius: 2%">
+                    <div class="offcanvas-body small" style="padding: 20px;">
+                        <div class="row align-items-center">
+                            <div class="col-1">
+                                <img id="canvas-icon" src="" style="width: 25px;height: 25px">
+                            </div>
+                            <div class="col-11">
+                                <div id="canvas-filename"></div>
+                                <div id="canvas-modifyTime" style="font-size: 0.75rem"></div>
+                            </div>
+                            <div>
+                                <a type="button" class="download btn btn-sm btn-outline-success"
+                                   style="width: 100%;margin-top: 40px" href="">下载
+                                </a>
+                            </div>
+                            <div>
+                                <button type="button" class="delete btn btn-sm btn-outline-danger"
+                                        style="width: 100%;margin-top: 10px">删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--      大于768px 电脑端      -->
+            <div class="d-none d-md-block">
+                <div class="row align-items-center" style="padding: 10px 0 10px 0">
+                    <div class="col-7">
+                        <div class="input-group">
+                            <input type="text" class="form-control key" placeholder="请输入关键字" th:value="${key}">
+                            <span class="input-group-text search">
+                                <img src="/img/search.png" style="width: 25px;height: 25px" alt="">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-1"></div>
+                    <div class="col-1 progress-bar"></div>
+                    <div class="col-1">
+                        <img class="header-icon upload" src="/img/upload.png" alt="上传">
+                    </div>
+                    <div class="col-1">
+                        <img class="header-icon home" src="/img/home.png" alt="首页">
+                    </div>
+                    <!--                    <div class="col-1">-->
+                    <!--                        <img class="header-icon add" src="/img/add.png" alt="添加">-->
+                    <!--                    </div>-->
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">文件名称</th>
+                        <th scope="col">文件大小</th>
+                        <th scope="col">文件类型</th>
+                        <th scope="col">修改时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <a class="download" href="" style="display: none">download</a>
+                    <tr th:each="f:${files}" th:class="${f.isDirectory}?'directory':'file'" th:filename="${f.filename}">
+                        <td>
+                            <img th:src="${f.icon}" style="width: 25px;height: 25px">
+                            <span th:text="${f.abbrName}"></span>
+                        </td>
+                        <td th:text="${f.size}"></td>
+                        <td th:text="${f.type}"></td>
+                        <td th:text="${f.modifyTime}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $.contextMenu({
+        selector: ".file",
+        items: {
+            foo: {
+                name: "下载", callback: function (key, opt) {
+                    let filename = opt.$trigger.attr('filename');
+                    let download = $('.download');
+                    // console.log(download)
+                    // download.attr('href','/file/download?filepath=' + window.location.pathname + '&filename=' + filename)
+                    // download.click()
+                    window.open('/file/download?filepath='+window.location.pathname+'&filename='+filename,'_blank')
+                }
+            },
+            bar: {
+                name: "删除", callback: function (key, opt) {
+                    let r = confirm("是否删除？");
+                    if(r===true){
+                        deleteFile(opt.$trigger.attr('filename'))
+                    }
+                }
+            }
+        }
+    });
+
+    $('.home').click(function () {
+        window.location.href = '/file'
+    })
+
+    $('.search').click(function () {
+        search()
+    })
+
+    $('.key').keypress(function () {
+        if (event.which == 13) {
+            search()
+        }
+    })
+
+
+    function search() {
+        let text = $('.key').val();
+        if (text === "") {
+            console.log(1)
+            window.location.href = window.location.pathname
+        } else {
+            window.location.href = window.location.pathname + "?key=" + text
+        }
+    }
+
+    $('.directory').click(function () {
+        let dir = $(this).attr('filename');
+        window.location.href = window.location.pathname + '/' + dir;
+    })
+
+    //读取列表单个文件信息，给offcanvas弹框上追加信息
+    const offcanvas = $('.offcanvas');
+    offcanvas.bind('show.bs.offcanvas', event => {
+        //col-1 col-11
+        let row = $(event.relatedTarget).children('div').children('div');
+
+        let icon = $(row[0]).children('img').attr('src');
+        let nameAndTime = $(row[1]).children('div');
+        let filename = $(nameAndTime[0]).text()
+        let modifyTime = $(nameAndTime[1]).text();
+        $('#canvas-filename').text(filename)
+        $('#canvas-icon').attr('src', icon)
+        $('#canvas-modifyTime').text(modifyTime)
+        $('.download').attr('href', '/file/download?filepath=' + window.location.pathname + '&filename=' + filename)
+    })
+
+    //点击上传按钮打开文件夹
+    $('.upload').click(function () {
+        $('#file-input').click();
+    })
+
+    $('#file-input').change(function () {
+        let data = new FormData();
+        data.append('filepath', window.location.pathname)
+        data.append('file', $('#file-input').prop('files')[0]);
+        var progress = $('.progress-bar');
+        progress.css('display', 'block')
+        $.ajax({
+            url: '/file/upload',
+            type: 'post',
+            data: data,
+            contentType: false,
+            processData: false,
+            xhr: function () {
+                let xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function (e) {
+                    //loaded代表上传了多少
+                    //total代表总数为多少
+                    let progressRate = parseInt((e.loaded / e.total) * 100) + '%';
+                    console.log(progressRate)
+                    progress.text(progressRate)
+                    //通过设置进度条的宽度达到效果
+                    // $('.progress > div').css('width', progressRate);
+                })
+                return xhr;
+            },
+            success: function (data) {
+                console.log(data)
+                window.location.reload()
+            }
+        })
+    })
+
+
+    $('.delete').click(() => {
+        $('.offcanvas').offcanvas('hide');
+        deleteFile($('#canvas-filename').text())
+    })
+
+    function deleteFile(filename) {
+        $.ajax({
+            url: '/file/delete?filepath=' + window.location.pathname + "&filename=" + filename,
+            type: 'get',
+            success: function (e) {
+                if (e.code === 1) {
+                    window.location.reload()
+                } else {
+
+                }
+                console.log(111)
+            },
+            error: function () {
+                console.log('接口调用失败')
+            }
+        })
+    }
+
+
+</script>
+</html>
