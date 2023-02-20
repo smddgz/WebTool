@@ -31,10 +31,6 @@ import java.util.List;
 public class FileController {
     @Value("${filepath}/file")
     String root;
-    @Value("${pageNum}")
-    Integer pageNum;
-    @Value("${pageSize}")
-    Integer pageSize;
 
     @Autowired
     FileService fileService;
@@ -60,8 +56,11 @@ public class FileController {
     }
 
     @GetMapping("/file/exist")
-    public String exist(){
-        return "";
+    public Result exist(String filepath,String filename){
+        if (fileService.fileExist(filepath,filename)) {
+
+        }
+        return null;
     }
 
     @ResponseBody
@@ -113,29 +112,13 @@ public class FileController {
         return file.delete() ? new Result(1,"删除成功") : new Result(-2,"删除失败");
     }
 
-    @GetMapping("/test")
-    public String test(){
-        return "test";
+    @GetMapping("/file/createFile")
+    public void createFile(){
+
     }
 
-    @GetMapping("/uploadTest")
-    public void test(HttpServletResponse response) throws IOException {
-        ServletOutputStream os = response.getOutputStream();
-        String s = "D:/test/file/a.dll";
-        FileInputStream fis = new FileInputStream(s);
-        response.setStatus(HttpStatus.OK.value());
-        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=a.dll");
-        byte[] bytes = new byte[1024];
-        int l;
-        while ((l = fis.read(bytes)) != -1) {
-            os.write(bytes, 0, l);
-            os.flush();
-        }
-    }
+    @GetMapping("/file/createDir")
+    public void createDir(){
 
-    public static void main(String[] args) {
-        String s = "/file";
-        System.out.println(Arrays.toString(s.split("/")));
     }
 }

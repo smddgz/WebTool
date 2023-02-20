@@ -1,0 +1,35 @@
+#!/bin/bash
+
+name="WebTool-1.0-SNAPSHOT.jar"
+path="/opt/WebTool/"
+
+stop(){
+pid=`ps -ef | grep $name | grep -v grep | awk '{print $2}'`
+
+if [[ -z "${pid}" ]]
+then
+    echo application is not running
+else
+    echo kill ${pid}
+    kill -9 ${pid}
+fi
+}
+
+start(){
+nohup java -jar $path$name >> out.log 2>&1 &
+echo $name is running
+}
+
+if [ $1 == "stop" ]
+then
+    stop
+elif [ $1 == "start" ]
+then
+    start
+elif [ $1 == "restart" ]
+then
+    stop
+    start
+else
+    echo "incorrect args |start|stop|restart|"
+fi
