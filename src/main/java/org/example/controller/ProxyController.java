@@ -1,6 +1,5 @@
 package org.example.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,13 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestController
 public class ProxyController {
@@ -38,6 +33,11 @@ public class ProxyController {
             e.printStackTrace();
             return "error";
         }
+    }
+
+    @GetMapping("/time")
+    public String time(){
+        return LocalDateTime.now().toString();
     }
 
 
