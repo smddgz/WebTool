@@ -14,7 +14,8 @@ public class VmessTest {
     public void getVmess()throws Exception{
         List<Map> maps = new ArrayList<>();
         Base64.Decoder decoder = Base64.getDecoder();
-        String s="eyJ2IjogIjIiLCAicHMiOiAiNDUuMTQ3LjIwMS4yODoxNTkwMCIsICJhZGQiOiAiNDUuMTQ3LjIwMS4yOCIsICJwb3J0IjogMTU5MDAsICJhaWQiOiAwLCAidHlwZSI6ICJ1dHAiLCAibmV0IjogImtjcCIsICJwYXRoIjogIiIsICJob3N0IjogIiIsICJpZCI6ICIyYWI2ZjlhNS02Y2E3LTRlZTAtOTc2OC0wNmE0NzdjOGJjY2MiLCAidGxzIjogIm5vbmUifQ==";
+        String s="vmess://eyJ2IjogIjIiLCAicHMiOiAiMzguMTUwLjAuMTcxOjkwMDEiLCAiYWRkIjogIjM4LjE1MC4wLjE3MSIsICJwb3J0IjogOTAwMSwgImFpZCI6IDAsICJ0eXBlIjogIndlY2hhdC12aWRlbyIsICJuZXQiOiAia2NwIiwgInBhdGgiOiAiIiwgImhvc3QiOiAiIiwgImlkIjogIjY4MzhhODU1LTg2ZGQtNDMyMC1iMjgwLTg3N2VhMDJhMDE0YyIsICJ0bHMiOiAibm9uZSJ9";
+        s = s.substring(8);
         ObjectMapper om = new ObjectMapper();
         byte[] decode = decoder.decode(s.getBytes(StandardCharsets.UTF_8));
         Map map = om.readValue(decode, Map.class);
@@ -24,7 +25,7 @@ public class VmessTest {
         String host = split[0];
         int port=Integer.parseInt(split[1]);
         StringBuilder sb=new StringBuilder();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 3; i++) {
             map.put("ps",host+":"+(port+i));
             map.put("port",(port+i));
             byte[] bytes = om.writer().writeValueAsBytes(map);

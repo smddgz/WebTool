@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,22 +19,42 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
 public class FileController {
     @Value("${filepath}/file")
     String root;
-
     @Autowired
     FileService fileService;
+    String logPath="/var/log/v2ray";
+    @GetMapping("/v2ray/log")
+    public void v2rayLog(HttpServletResponse response,@RequestHeader(required = false,value = "Authorization") String pwd) throws IOException {
+        if(!"nmsl".equals(pwd)){
+            return;
+        }
+        byte[] bytes = Files.readAllBytes(Paths.get(logPath+"/access.log"));
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"inline");
+        response.getOutputStream().write(bytes);
+    }
+
+    @ResponseBody
+    @GetMapping("/v2ray/clear")
+    public String clearLog(){
+        try {
+            new FileOutputStream(logPath+"/access.log").write("".getBytes());
+            new FileOutputStream(logPath+"/error.log").write("".getBytes());
+            return "success";
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return "error";
+        }
+    }
 
     @GetMapping("/file/**")
     public ModelAndView fileList(HttpServletRequest request) {
@@ -85,13 +106,16 @@ public class FileController {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename="+filename);
-
+        byte[] bytes1 = filename.getBytes();
+        String s = new String(bytes1, StandardCharsets.ISO_8859_1);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename="+s);
         byte[] bytes = new byte[1024 * 1024];
         ServletOutputStream os = null;
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(fileService.getFileFromParam(filepath, filename));
+            File file = fileService.getFileFromParam(filepath, filename);
+            response.setHeader(HttpHeaders.CONTENT_LENGTH,file.length()+"");
+            fis = new FileInputStream(file);
             os = response.getOutputStream();
             int l;
             while ((l = fis.read(bytes)) != -1) {
