@@ -1,5 +1,8 @@
 server:
-  port: 80
+  port: 443
+  ssl:
+    key-store-password: 123456
+    key-store: classpath:cert.p12
 
 spring:
   profiles:
