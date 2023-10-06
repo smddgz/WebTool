@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 public class ProxyController {
@@ -38,6 +39,11 @@ public class ProxyController {
     @GetMapping("/time")
     public String time(){
         return LocalDateTime.now().toString();
+    }
+
+    @GetMapping("/uuid")
+    public String uuid(){
+        return UUID.randomUUID().toString();
     }
 
 
